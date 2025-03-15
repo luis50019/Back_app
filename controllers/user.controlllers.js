@@ -16,13 +16,14 @@ export class userControllers {
 
       //return data of user
 
-      res
-        .cookie("access_token", token, {
-          httpOnly: true,
-          secure: false, // ❌ No usar en producción
-          sameSite: "lax", // 🔹 Alternativa si solo necesitas compartir en subdominios
-        })
-        .json({ user, message: "user login" });
+      res.cookie("access_token", token, {
+            httpOnly: true, // No accesible desde JavaScript (seguro para protección contra XSS)
+            secure: process.env.NODE_ENV === "production", // Solo para HTTPS
+            sameSite: "None", // Permitir que la cookie sea enviada con solicitudes cross-origin
+            expires: new Date(Date.now() + 86400000), // Expira en 1 día (puedes ajustar esto)
+            path: "/", // Asegura que la cookie esté disponible para todas las rutas
+          })
+          .json({ user, message: "user login" });
     } catch (error) {
       res.status(401).json({ message: error.message });
     }
@@ -36,16 +37,18 @@ export class userControllers {
       if (!user) throw new Error("error al registrar el usuario");
 
       const token = jwt.sign({ id: user._id }, SECRET_PASSWORD, {
-        expiresIn: "1d",
+        expiresIn: 1,
       });
 
       //return data of user
 
       res
         .cookie("access_token", token, {
-          httpOnly: true,
-          secure: false, // ❌ No usar en producción
-          sameSite: "lax", // 🔹 Alternativa si solo necesitas compartir en subdominios
+          httpOnly: true, // No accesible desde JavaScript (seguro para protección contra XSS)
+          secure: process.env.NODE_ENV === "production", // Solo para HTTPS
+          sameSite: "None", // Permitir que la cookie sea enviada con solicitudes cross-origin
+          expires: new Date(Date.now() + 86400000), // Expira en 1 día (puedes ajustar esto)
+          path: "/", // Asegura que la cookie esté disponible para todas las rutas
         })
         .json({ user, message: "user register" });
 
