@@ -1,59 +1,73 @@
 import { userModel } from "../models/user.model.js";
 import jwt from 'jsonwebtoken';
+import { validateUserLogin,validateUserRegister } from "../Schema/userSchema.js";
 import {SECRET_PASSWORD} from '../utils.js';
 
 export class userControllers {
   static login = async (req, res) => {
     try {
 
+      //first validate the data of the req
+      const result = validateUserLogin(req.body);
+      if(!result.success){
+        const messageError = [];
+        result.error.errors.map(e=>{
+          messageError.push(e.message);
+        })
+        throw new Error(messageError);
+      }
+
       const user = await userModel.loginUser(req.body); 
-      
-      if(!user) throw new Error("error al inciar sesion");
+      if(!user) throw new Error({ errors: "error al inciar sesion" });
       
       const token = jwt.sign({ id: user._id }, SECRET_PASSWORD, {
         expiresIn: "1d",
       });
-
       //return data of user
-
       res.cookie("access_token", token, {
-            httpOnly: true, // No accesible desde JavaScript (seguro para protección contra XSS)
-            secure: process.env.NODE_ENV === "production", // Solo para HTTPS
-            sameSite: "None", // Permitir que la cookie sea enviada con solicitudes cross-origin
-            expires: new Date(Date.now() + 86400000), // Expira en 1 día (puedes ajustar esto)
-            path: "/", // Asegura que la cookie esté disponible para todas las rutas
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "None",
+            expires: new Date(Date.now() + 86400000),
+            path: "/",
           })
           .json({ user, message: "user login" });
     } catch (error) {
-      res.status(401).json({ message: error.message });
+      res
+        .status(401)
+        .json({ message: error.message });
     }
   };
 
   static register = async (req, res) => {
     try {
-      console.log(req.body)
+      const result = validateUserRegister(req.body);
+      if (!result.success) {
+        const messageError = [];
+        result.error.errors.map((e) => {
+          messageError.push(e.message);
+        });
+        throw new Error(messageError);
+      }
+
       const user = await userModel.registerUser(req.body);
-
       if (!user) throw new Error("error al registrar el usuario");
-
       const token = jwt.sign({ id: user._id }, SECRET_PASSWORD, {
         expiresIn: 1,
       });
-
       //return data of user
-
       res
         .cookie("access_token", token, {
-          httpOnly: true, // No accesible desde JavaScript (seguro para protección contra XSS)
-          secure: process.env.NODE_ENV === "production", // Solo para HTTPS
-          sameSite: "None", // Permitir que la cookie sea enviada con solicitudes cross-origin
-          expires: new Date(Date.now() + 86400000), // Expira en 1 día (puedes ajustar esto)
-          path: "/", // Asegura que la cookie esté disponible para todas las rutas
+          httpOnly: true, 
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "None", 
+          expires: new Date(Date.now() + 86400000),
+          path: "/",
         })
         .json({ user, message: "user register" });
 
-    } catch (Error) {
-      res.status(401).json({ message: Error.message }).clearCookie('access_token');
+    } catch (error) {
+      res.status(401).json({ message: error.message });
     }
   };
 
@@ -72,4 +86,28 @@ export class userControllers {
       res.status(403).json({message:e.message})
     }
   }
+
+  static verifyToken = async(req,res)=>{
+    try {
+      const {access_token} = req.cookies;
+
+      if(!access_token){
+        throw new Error("El token no existe");
+      }
+
+      try{
+        
+        const dataToken = jwt.verify(access_token,SECRET_PASSWORD);
+        res.status(200).json({message:"token valido"});
+
+      }catch(e){
+        throw new Error("El token no es valido");
+      }
+
+
+    } catch (error) {
+      res.status(401).json({message:error.message})
+    }
+  }
+
 }
