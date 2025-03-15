@@ -17,7 +17,7 @@ export const corsMiddleware =({accepted_origins = ACCEPTED_ORIGINS} = {})=>{
       }
       return callback(new Error("origin no accepted"));
     },
-    methods:['GET','POST','PUT','DELETE','PATCH'],
+    methods:['GET','POST','PUT','DELETE','PATCH','HEAD'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials:true
   })
