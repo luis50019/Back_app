@@ -18,9 +18,11 @@ export class userControllers {
 
       res
         .cookie("access_token", token, {
-          sameSite: true,
+          httpOnly: true,
+          secure: false, // ❌ No usar en producción
+          sameSite: "lax", // 🔹 Alternativa si solo necesitas compartir en subdominios
         })
-        .json({user,message:"user login"});
+        .json({ user, message: "user login" });
     } catch (error) {
       res.status(401).json({ message: error.message });
     }
@@ -41,7 +43,9 @@ export class userControllers {
 
       res
         .cookie("access_token", token, {
-          sameSite: true,
+          httpOnly: true,
+          secure: false, // ❌ No usar en producción
+          sameSite: "lax", // 🔹 Alternativa si solo necesitas compartir en subdominios
         })
         .json({ user, message: "user register" });
 

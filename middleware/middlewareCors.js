@@ -12,7 +12,7 @@ export const corsMiddleware =({accepted_origins = ACCEPTED_ORIGINS} = {})=>{
         return callback(null,true)
       }
 
-      if(ACCEPTED_ORIGINS.includes(origin)){
+      if(accepted_origins.includes(origin)){
         return callback(null,true)
       }
       return callback(new Error("origin no accepted"));
