@@ -15,6 +15,10 @@ app.use(json());
 app.use(morgan('dev'));
 
 app.use('/',userRouter)
+// Asegúrate de que esta ruta no requiera autenticación
+app.get('/health', (req, res) => {
+  res.status(200).send('API is live');
+});
 
 
 app.listen(PORT,()=>{

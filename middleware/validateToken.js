@@ -2,6 +2,11 @@ import jwt from "jsonwebtoken";
 import { SECRET_PASSWORD } from "../utils.js";
 
 export default function validateToken(req, res, next) {
+
+  if (req.path === "/health") {
+    return next(); // No se valida el token para esta ruta
+  }
+
   const { access_token } = req.cookies;
 
   if (!access_token) {
