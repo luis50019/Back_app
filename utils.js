@@ -1,0 +1,1 @@
+export const SECRET_PASSWORD = "edehrher_deoerjre48re";
