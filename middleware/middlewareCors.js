@@ -1,8 +1,9 @@
 import cors from 'cors';
 
-const ACCEPTED_ORIGINS=[
-  "http://localhost:5173"
-]
+const ACCEPTED_ORIGINS = [
+  "http://localhost:5173",
+  "https://front-app-kappa.vercel.app",
+];
 
 export const corsMiddleware =({accepted_origins = ACCEPTED_ORIGINS} = {})=>{
   return cors({
