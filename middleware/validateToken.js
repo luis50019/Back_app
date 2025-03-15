@@ -9,9 +9,9 @@ export default function validateToken(req,res,next){
   try{
     const data = jwt.verify(access_token,SECRET_PASSWORD);
     console.log("token valido: ",data)
+    next();
   }catch(e){
     res.status(401).json({messgae:"el token no es valido"});
   }
-  next();
 }
 
