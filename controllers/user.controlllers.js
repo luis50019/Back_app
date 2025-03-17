@@ -51,7 +51,7 @@ export class userControllers {
       const user = await userModel.registerUser(req.body);
       if (!user) throw new Error("error al registrar el usuario");
       const token = jwt.sign({ id: user._id }, SECRET_PASSWORD, {
-        expiresIn: 1,
+        expiresIn: "1d",
       });
       //return data of user
       res
@@ -64,6 +64,7 @@ export class userControllers {
         })
         .json({ user, message: "user register" });
     } catch (error) {
+      console.log(error.message)
       res.status(401).json({ message: error.message });
     }
   };
@@ -95,7 +96,7 @@ export class userControllers {
   static verifyToken = async (req, res) => {
     try {
       const { access_token } = req.cookies;
-
+      console.log(access_token)
       if (!access_token) {
         throw new Error("El token no existe");
       }
