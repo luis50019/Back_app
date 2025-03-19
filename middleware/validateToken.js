@@ -15,7 +15,6 @@ export default function validateToken(req, res, next) {
 
   try {
     const data = jwt.verify(access_token, SECRET_PASSWORD);
-    console.log("Token válido:", data);
     req.user = data; 
     next();
   } catch (e) {
